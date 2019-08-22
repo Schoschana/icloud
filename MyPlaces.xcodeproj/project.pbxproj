@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		22200B3B230F1F3000305D5F /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 22200B3A230F1F3000305D5F /* CloudKit.framework */; };
 		226E0648230A8F730060172B /* CloudManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 226E0647230A8F730060172B /* CloudManager.swift */; };
-		226E0652230AF6C00060172B /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226E0651230AF6C00060172B /* CloudKit.framework */; };
 		8B9DAF42F91ECB0D47E8A3DB /* Pods_MyPlaces.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 733859ED947291EC14E99950 /* Pods_MyPlaces.framework */; };
 		A82E5BE521A5315800BD5158 /* NewPlaceViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A82E5BE421A5315800BD5158 /* NewPlaceViewController.swift */; };
 		A895AEC921934CA7006ACC1B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A895AEC821934CA7006ACC1B /* AppDelegate.swift */; };
@@ -26,9 +26,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		22200B3A230F1F3000305D5F /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		226E0642230A6FC80060172B /* MyPlaces.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyPlaces.entitlements; sourceTree = "<group>"; };
 		226E0647230A8F730060172B /* CloudManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudManager.swift; sourceTree = "<group>"; };
-		226E0651230AF6C00060172B /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		3FE30A28997B9A1FB13D9B2C /* Pods-MyPlaces.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyPlaces.release.xcconfig"; path = "Pods/Target Support Files/Pods-MyPlaces/Pods-MyPlaces.release.xcconfig"; sourceTree = "<group>"; };
 		733859ED947291EC14E99950 /* Pods_MyPlaces.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyPlaces.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		95EBA851E462D757B85991E0 /* Pods-MyPlaces.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyPlaces.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MyPlaces/Pods-MyPlaces.debug.xcconfig"; sourceTree = "<group>"; };
@@ -54,7 +54,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				226E0652230AF6C00060172B /* CloudKit.framework in Frameworks */,
+				22200B3B230F1F3000305D5F /* CloudKit.framework in Frameworks */,
 				A8F146FE2212926C000E7D78 /* MapKit.framework in Frameworks */,
 				8B9DAF42F91ECB0D47E8A3DB /* Pods_MyPlaces.framework in Frameworks */,
 			);
@@ -66,7 +66,7 @@
 		A3E62A2428117415D511FF13 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				226E0651230AF6C00060172B /* CloudKit.framework */,
+				22200B3A230F1F3000305D5F /* CloudKit.framework */,
 				A8F146FD2212926C000E7D78 /* MapKit.framework */,
 				733859ED947291EC14E99950 /* Pods_MyPlaces.framework */,
 			);
@@ -205,7 +205,7 @@
 								enabled = 0;
 							};
 							com.apple.Push = {
-								enabled = 0;
+								enabled = 1;
 							};
 							com.apple.iCloud = {
 								enabled = 1;

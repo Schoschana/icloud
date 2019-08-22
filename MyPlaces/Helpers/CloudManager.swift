@@ -6,16 +6,17 @@
 //  Copyright © 2019 Alexey Efimov. All rights reserved.
 //
 
+
 import UIKit
 import CloudKit
 import RealmSwift
 
 class CloudManager {
     
-    private static let privateCloudDatabase = CKContainer.default().publicCloudDatabase
+    private static let privateCloudDatabase = CKContainer.default().privateCloudDatabase
     private static var records: [CKRecord] = []
     
-    static func saveDataToCloud(place: Place, with image: UIImage,clouser: @escaping (String) -> ()) {
+    static func saveDataToCloud(place: Place, with image: UIImage, clouser: @escaping (String) -> ()) {
         
         let (image, url) = prepareImageToSaveToCloud(place: place, image: image)
         
@@ -30,7 +31,6 @@ class CloudManager {
         record.setValue(imageAsset, forKey: "imageData")
         
         privateCloudDatabase.save(record) { (newRecord, error) in
-            
             if let error = error { print(error); return }
             if let newRecord = newRecord {
                 clouser(newRecord.recordID.recordName)
@@ -39,14 +39,15 @@ class CloudManager {
         }
     }
     
-    static func fetchDataFromCloud(places: Results<Place>,closure: @escaping (Place) -> ()) {
+    static func fetchDataFromCloud(places: Results<Place>, closure: @escaping (Place) -> ()) {
         
         let query = CKQuery(recordType: "Place", predicate: NSPredicate(value: true))
         query.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        
         let queryOperation = CKQueryOperation(query: query)
-        queryOperation.desiredKeys = ["recordID", "placeID", "name", "location","type", "rating"]
-         queryOperation.resultsLimit = 5
-        queryOperation.queuePriority =  .veryHigh
+        queryOperation.desiredKeys = ["recordID", "placeID", "name", "location", "type", "rating"]
+        queryOperation.resultsLimit = 5
+        queryOperation.queuePriority = .veryHigh
         
         queryOperation.recordFetchedBlock = { record in
             
@@ -58,39 +59,41 @@ class CloudManager {
                     closure(newPlace)
                 }
             }
-            
         }
         
         queryOperation.queryCompletionBlock = { cursor, error in
             if let error = error { print(error.localizedDescription); return }
-            guard let cursor = cursor else {return }
+            guard let cursor = cursor else { return }
             
-            let secondQuerationOperation = CKQueryOperation(cursor: cursor)
+            let secondQueryOperation = CKQueryOperation(cursor: cursor)
             
-           secondQuerationOperation.recordFetchedBlock = { record in
+            secondQueryOperation.recordFetchedBlock = { record in
                 self.records.append(record)
                 let newPlace = Place(record: record)
-            DispatchQueue.main.async {
-                if newCloudRecordIsAvailable(places: places, placeID: newPlace.placeID){
-                    
-              closure(newPlace)
+                
+                DispatchQueue.main.async {
+                    if newCloudRecordIsAvailable(places: places, placeID: newPlace.placeID) {
+                        closure(newPlace)
+                    }
+                }
             }
-            }
-            }
-            secondQuerationOperation.queryCompletionBlock = queryOperation.queryCompletionBlock
-            privateCloudDatabase.add(secondQuerationOperation)
             
+            secondQueryOperation.queryCompletionBlock = queryOperation.queryCompletionBlock
+            privateCloudDatabase.add(secondQueryOperation)
         }
+        
         privateCloudDatabase.add(queryOperation)
     }
+    
     static func updateCloudData(place: Place, with image: UIImage) {
+        
         let recordID = CKRecord.ID(recordName: place.recordID)
         
-        let(image, url) = prepareImageToSaveToCloud(place: place, image: image)
-        
-        guard let imageAsset = image, let imageURL = url  else { return }
+        let (image, url) = prepareImageToSaveToCloud(place: place, image: image)
+        guard let imageAsset = image, let imageURL = url else { return }
         
         privateCloudDatabase.fetch(withRecordID: recordID) { (record, error) in
+            
             if let record = record, error == nil {
                 
                 DispatchQueue.main.async {
@@ -101,41 +104,59 @@ class CloudManager {
                     record.setValue(imageAsset, forKey: "imageData")
                     
                     privateCloudDatabase.save(record, completionHandler: { (_, error) in
-                        if let error = error { print(error.localizedDescription); return
-                            deleteTempImage(imageURL: imageURL)
-                        }
+                        if let error = error { print(error.localizedDescription); return }
+                        deleteTempImage(imageURL: imageURL)
                     })
                 }
             }
         }
     }
-    static func getImageFromColoud(place: Place, closure:@escaping (Data?) -> ()) {
+    
+    static func getImageFromCloud(place: Place, closure: @escaping (Data?) -> ()) {
+        
         records.forEach { (record) in
             
-            if place.recordID == record.recordID.recordName  {
-            let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: [record.recordID])
-            fetchRecordsOperation.desiredKeys = ["imageData"]
-            fetchRecordsOperation.queuePriority = .veryHigh
-            
-            fetchRecordsOperation.perRecordCompletionBlock = { record, _, error in
-                guard error == nil else { return }
-                guard let record = record else { return }
-                guard let possibleImage = record.value(forKey: "imageData") as? CKAsset else { return }
-                guard let imageData = try? Data(contentsOf: possibleImage.fileURL!) else { return }
+            if place.recordID == record.recordID.recordName {
+                let fetchRecordsOperation = CKFetchRecordsOperation(recordIDs: [record.recordID])
+                fetchRecordsOperation.desiredKeys = ["imageData"]
+                fetchRecordsOperation.queuePriority = .veryHigh
                 
-                DispatchQueue.main.async {
-                   
-                    closure(imageData)
+                fetchRecordsOperation.perRecordCompletionBlock = { record, _, error in
+                    guard error == nil else { return }
+                    guard let record = record else { return }
+                    guard let possibleImage = record.value(forKey: "imageData") as? CKAsset else { return }
+                    guard let imageData = try? Data(contentsOf: possibleImage.fileURL!) else { return }
+                    
+                    DispatchQueue.main.async {
+                        closure(imageData)
+                    }
                 }
+                
+                privateCloudDatabase.add(fetchRecordsOperation)
             }
-            privateCloudDatabase.add(fetchRecordsOperation)
         }
     }
-    }
-    
     
     static func deleteRecord(recordID: String) {
-        let query = CK
+        
+        let query = CKQuery(recordType: "Place", predicate: NSPredicate(value: true))
+        let queryOperation = CKQueryOperation(query: query)
+        queryOperation.desiredKeys = ["recordID"]
+        queryOperation.queuePriority = .veryHigh
+        
+        queryOperation.recordFetchedBlock = { record in
+            if record.recordID.recordName == recordID {
+                privateCloudDatabase.delete(withRecordID: record.recordID, completionHandler: { (_, error) in
+                    if let error = error { print(error); return }
+                })
+            }
+            
+            queryOperation.queryCompletionBlock = { _, error in
+                if let error = error { print(error); return }
+            }
+        }
+        
+        privateCloudDatabase.add(queryOperation)
     }
     
     // MARK: Private Methods
@@ -166,12 +187,15 @@ class CloudManager {
             print(error.localizedDescription)
         }
     }
+    
     private static func newCloudRecordIsAvailable(places: Results<Place>, placeID: String) -> Bool {
+        
         for place in places {
             if place.placeID == placeID {
                 return false
             }
         }
+        
         return true
     }
 }

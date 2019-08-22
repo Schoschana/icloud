@@ -10,7 +10,7 @@ import UIKit
 import Cosmos
 
 class CustomTableViewCell: UITableViewCell {
-
+    
     @IBOutlet var imageOfPlace: UIImageView! {
         didSet {
             imageOfPlace.layer.cornerRadius = imageOfPlace.frame.size.height / 2
@@ -23,20 +23,17 @@ class CustomTableViewCell: UITableViewCell {
     @IBOutlet var typeLabel: UILabel!
     @IBOutlet var cosmosView: CosmosView! {
         didSet {
-    cosmosView.settings.updateOnTouch = false
+            cosmosView.settings.updateOnTouch = false
             
-             }
-         }
+        }
+    }
     func configureCell(place: Place) {
         nameLabel.text = place.name
         locationLabel.text = place.location
         typeLabel.text = place.type
-      imageOfPlace.image = UIImage(data: place.imageData!)
-     cosmosView.rating = place.rating
-        
-        
-     
+        imageOfPlace.image = UIImage(data: place.imageData!)
+        cosmosView.rating = place.rating
         
         
     }
- }
+}

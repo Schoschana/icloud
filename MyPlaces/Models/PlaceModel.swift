@@ -44,7 +44,7 @@ class Place: Object {
         self.imageData = imageData
         self.rating = record.value(forKey: "rating") as! Double
         }
-    override static func primaryKey() -> String {
+    override static func primaryKey() -> String? {
         return "placeID"
     }
     }
